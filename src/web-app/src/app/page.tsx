@@ -2,19 +2,19 @@
 
 import { useEffect, useState } from "react";
 import { format } from "date-fns";
-import { Plus, ArrowRightLeft, ShieldAlert, Activity, CheckCircle2, CircleDashed } from "lucide-react";
+import { Plus, ArrowRightLeft, ShieldAlert, Activity, CheckCircle2, CircleDashed, Cpu } from "lucide-react";
 
 interface Transaction {
   id: number;
   amount: number;
   currency: string;
   status: string;
+  risk_score: number;
   timestamp: string;
 }
 
 export default function Dashboard() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [amount, setAmount] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
@@ -31,19 +31,33 @@ export default function Dashboard() {
     }
   };
 
-  const handleAddTransaction = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!amount) return;
+  const handleSimulateTransaction = async () => {
     setIsLoading(true);
 
     try {
+      // 1. Get real data sample from Sentinel Agent
+      const sampleRes = await fetch("http://localhost:8001/sample");
+      const sampleData = await sampleRes.json();
+      
+      const payload = {
+        amount: sampleData.Amount,
+        currency: "USD",
+        status: "PENDING",
+      };
+      
+      // Add all V features
+      for (let i = 1; i <= 28; i++) {
+        (payload as any)[`v${i}`] = sampleData[`V${i}`] || 0;
+      }
+
+      // 2. Inject into API Gateway
       const res = await fetch("http://localhost:8000/transactions", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ amount: parseFloat(amount), currency: "USD", status: "PENDING" }),
+        body: JSON.stringify(payload),
       });
+
       if (res.ok) {
-        setAmount("");
         fetchTransactions();
       }
     } catch (error) {
@@ -59,14 +73,21 @@ export default function Dashboard() {
         return <CircleDashed className="w-5 h-5 text-amber-500 animate-spin-slow" />;
       case "COMPLETED":
         return <CheckCircle2 className="w-5 h-5 text-emerald-500" />;
+      case "FLAGGED":
+        return <ShieldAlert className="w-5 h-5 text-rose-500 animate-pulse" />;
       default:
         return <Activity className="w-5 h-5 text-gray-500" />;
     }
   };
 
+  const getRiskColor = (score: number) => {
+    if (score >= 80) return "text-rose-500";
+    if (score >= 50) return "text-amber-500";
+    return "text-emerald-500";
+  };
+
   return (
     <div className="min-h-screen bg-[#0A0A0B] text-slate-200 font-sans selection:bg-indigo-500/30">
-      {/* Premium Gradient Background */}
       <div className="fixed inset-0 z-0 pointer-events-none bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-indigo-900/20 via-[#0A0A0B] to-[#0A0A0B]"></div>
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -80,28 +101,14 @@ export default function Dashboard() {
             <p className="mt-2 text-slate-400 text-lg">Autonomous Finance Trust Infrastructure</p>
           </div>
           <div className="mt-6 md:mt-0">
-            <form onSubmit={handleAddTransaction} className="flex items-center gap-3 bg-white/5 p-2 rounded-2xl border border-white/10 backdrop-blur-md">
-              <div className="relative">
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-medium">$</span>
-                <input
-                  type="number"
-                  step="0.01"
-                  placeholder="Amount"
-                  value={amount}
-                  onChange={(e) => setAmount(e.target.value)}
-                  className="w-40 bg-transparent py-2 pl-8 pr-4 text-white placeholder-slate-500 outline-none focus:ring-2 focus:ring-indigo-500/50 rounded-xl transition-all"
-                  required
-                />
-              </div>
-              <button
-                type="submit"
-                disabled={isLoading}
-                className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white px-5 py-2.5 rounded-xl font-medium transition-all shadow-lg shadow-indigo-500/25 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {isLoading ? <CircleDashed className="w-5 h-5 animate-spin" /> : <Plus className="w-5 h-5" />}
-                <span>Inject</span>
-              </button>
-            </form>
+            <button
+              onClick={handleSimulateTransaction}
+              disabled={isLoading}
+              className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white px-6 py-3 rounded-xl font-medium transition-all shadow-lg shadow-indigo-500/25 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isLoading ? <CircleDashed className="w-5 h-5 animate-spin" /> : <Cpu className="w-5 h-5" />}
+              <span>Simulate Real Transaction</span>
+            </button>
           </div>
         </header>
 
@@ -131,6 +138,7 @@ export default function Dashboard() {
                     <tr className="text-xs uppercase tracking-wider text-slate-500 border-b border-white/5">
                       <th className="px-6 py-4 font-medium">Tx ID</th>
                       <th className="px-6 py-4 font-medium">Amount</th>
+                      <th className="px-6 py-4 font-medium">Risk Score</th>
                       <th className="px-6 py-4 font-medium">Status</th>
                       <th className="px-6 py-4 font-medium text-right">Timestamp</th>
                     </tr>
@@ -138,9 +146,9 @@ export default function Dashboard() {
                   <tbody className="divide-y divide-white/5">
                     {transactions.length === 0 ? (
                       <tr>
-                        <td colSpan={4} className="px-6 py-12 text-center text-slate-500">
+                        <td colSpan={5} className="px-6 py-12 text-center text-slate-500">
                           <ArrowRightLeft className="w-12 h-12 mx-auto mb-3 opacity-20" />
-                          No transactions found. Inject a transaction to begin.
+                          No transactions found. Simulate a transaction to begin.
                         </td>
                       </tr>
                     ) : (
@@ -157,14 +165,25 @@ export default function Dashboard() {
                           </td>
                           <td className="px-6 py-4">
                             <div className="flex items-center gap-2">
+                              <span className={`text-xl font-bold ${getRiskColor(tx.risk_score)}`}>
+                                {tx.risk_score}
+                              </span>
+                              <span className="text-xs text-slate-500">/100</span>
+                            </div>
+                          </td>
+                          <td className="px-6 py-4">
+                            <div className="flex items-center gap-2">
                               {getStatusIcon(tx.status)}
-                              <span className={`text-sm font-medium ${tx.status === 'PENDING' ? 'text-amber-500' : 'text-emerald-500'}`}>
+                              <span className={`text-sm font-medium ${
+                                tx.status === 'FLAGGED' ? 'text-rose-500' : 
+                                tx.status === 'COMPLETED' ? 'text-emerald-500' : 'text-amber-500'
+                              }`}>
                                 {tx.status}
                               </span>
                             </div>
                           </td>
                           <td className="px-6 py-4 text-right text-sm text-slate-400">
-                            {format(new Date(tx.timestamp), "MMM dd, yyyy HH:mm:ss")}
+                            {format(new Date(tx.timestamp), "HH:mm:ss")}
                           </td>
                         </tr>
                       ))
@@ -187,6 +206,19 @@ export default function Dashboard() {
               </p>
             </div>
 
+            <div className="bg-white/[0.02] border border-rose-500/20 rounded-3xl p-6">
+              <h3 className="text-sm font-medium text-rose-400 mb-2 flex items-center gap-2">
+                <ShieldAlert className="w-4 h-4" />
+                Fraud Prevented
+              </h3>
+              <p className="text-3xl font-bold text-white">
+                ${transactions.filter(t => t.status === 'FLAGGED').reduce((acc, tx) => acc + tx.amount, 0).toLocaleString(undefined, { maximumFractionDigits: 0 })}
+              </p>
+              <p className="text-xs text-slate-500 mt-2">
+                {transactions.filter(t => t.status === 'FLAGGED').length} flagged transactions
+              </p>
+            </div>
+
             <div className="bg-white/[0.02] border border-white/10 rounded-3xl p-6">
               <h3 className="text-sm font-medium text-slate-400 mb-4">System Status</h3>
               <div className="space-y-4">
@@ -199,8 +231,8 @@ export default function Dashboard() {
                   <span className="text-xs font-medium px-2 py-1 bg-emerald-500/10 text-emerald-400 rounded-lg">Connected</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-sm text-slate-300">Sensing Layer</span>
-                  <span className="text-xs font-medium px-2 py-1 bg-amber-500/10 text-amber-400 rounded-lg">Standby</span>
+                  <span className="text-sm text-slate-300">Sentinel Agent</span>
+                  <span className="text-xs font-medium px-2 py-1 bg-indigo-500/10 text-indigo-400 rounded-lg">Active (Isolation Forest)</span>
                 </div>
               </div>
             </div>

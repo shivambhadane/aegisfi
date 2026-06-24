@@ -9,4 +9,5 @@ class Transaction(Base):
     amount = Column(Float, nullable=False)
     currency = Column(String, index=True, default="USD")
     status = Column(String, index=True, default="PENDING")
+    risk_score = Column(Integer, default=0)
     timestamp = Column(DateTime, default=datetime.datetime.utcnow)
