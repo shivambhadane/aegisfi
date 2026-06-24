@@ -143,7 +143,7 @@ export default function Overview() {
                </li>
              </ul>
              <div className="mt-12 p-6 border border-[#f04b36]/30 bg-[#f04b36]/5 text-[#f04b36] font-mono text-sm leading-relaxed">
-               > AEGIS-FI merges Detection + Memory + Simulation + Governance + Ledger into a single, mathematically rigorous platform.
+               &gt; AEGIS-FI merges Detection + Memory + Simulation + Governance + Ledger into a single, mathematically rigorous platform.
              </div>
           </div>
         </div>
