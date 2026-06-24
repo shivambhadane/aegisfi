@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import Link from "next/link";
 import { Terminal, Database, Cpu, Lock, Server, Fingerprint, Code2, Network, BrainCircuit, ScanSearch, ShieldCheck, Activity } from "lucide-react";
 
 export default function Overview() {
@@ -68,13 +69,13 @@ export default function Overview() {
             >
               Explore Architecture
             </a>
-            <a 
-              href="#capabilities" 
+            <Link 
+              href="/docs" 
               className="border-2 border-[#0a0a0a] text-[#0a0a0a] px-8 py-4 font-bold uppercase tracking-wider text-sm hover:bg-[#0a0a0a]/5 transition-colors flex items-center justify-center"
               style={{ clipPath: 'polygon(15px 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%, 0 15px)' }}
             >
-              View Capabilities
-            </a>
+              Documentation
+            </Link>
           </motion.div>
         </div>
 
@@ -253,51 +254,69 @@ export default function Overview() {
               </p>
             </div>
 
-            {/* Right Visual Grid */}
-            <div className="relative p-12 lg:p-24 min-h-[600px] flex items-center justify-center">
+            {/* Complex Visual Grid */}
+            <div className="relative p-12 lg:p-24 min-h-[600px] flex items-center justify-center bg-[#111] overflow-hidden border-l border-[#222]">
               <div className="absolute inset-0 bg-[linear-gradient(to_right,#1a1a1a_1px,transparent_1px),linear-gradient(to_bottom,#1a1a1a_1px,transparent_1px)] bg-[size:3rem_3rem] opacity-50"></div>
               
-              <div className="relative z-10 w-full max-w-md space-y-6">
-                <div className="border border-[#333] bg-[#0a0a0a] p-6 relative group overflow-hidden">
-                  <div className="absolute top-0 left-0 w-1 h-full bg-[#333] group-hover:bg-white transition-colors"></div>
-                  <div className="flex items-center gap-4">
-                    <Network className="w-6 h-6 text-white" />
-                    <div>
-                      <h4 className="font-mono text-sm font-bold uppercase tracking-wider mb-1">API Gateway</h4>
-                      <p className="text-xs text-[#666]">Receiving Transaction Payload</p>
-                    </div>
+              <div className="relative z-10 w-full flex flex-col md:flex-row items-center justify-center gap-8">
+                
+                {/* Ingestion */}
+                <div className="flex flex-col items-center gap-4">
+                  <div className="border border-[#333] bg-[#0a0a0a] p-4 text-center group overflow-hidden w-40">
+                    <Network className="w-5 h-5 text-white mx-auto mb-2" />
+                    <h4 className="font-mono text-xs font-bold uppercase tracking-wider">Apache Kafka</h4>
+                    <p className="text-[10px] text-[#666]">Event Stream</p>
                   </div>
-                </div>
-                  
-                <div className="flex justify-center -my-3 relative z-0">
-                  <div className="w-[1px] h-10 bg-[#333]"></div>
-                </div>
-
-                <div className="border border-[#f04b36]/30 bg-[#f04b36]/5 p-6 relative group overflow-hidden">
-                  <div className="absolute top-0 left-0 w-1 h-full bg-[#f04b36] shadow-[0_0_15px_rgba(240,75,54,0.8)]"></div>
-                  <div className="flex items-center gap-4">
-                    <Cpu className="w-6 h-6 text-[#f04b36]" />
-                    <div>
-                      <h4 className="font-mono text-sm font-bold uppercase tracking-wider text-[#f04b36] mb-1">Sentinel Agent</h4>
-                      <p className="text-xs text-[#f04b36]/70">Isolation Forest Risk Scoring</p>
-                    </div>
+                  <div className="h-6 w-[1px] bg-[#f04b36] shadow-[0_0_10px_rgba(240,75,54,0.5)]"></div>
+                  <div className="border border-[#333] bg-[#0a0a0a] p-4 text-center w-40">
+                    <Server className="w-5 h-5 text-white mx-auto mb-2" />
+                    <h4 className="font-mono text-xs font-bold uppercase tracking-wider">API Gateway</h4>
+                    <p className="text-[10px] text-[#666]">Routing</p>
                   </div>
                 </div>
 
-                <div className="flex justify-center -my-3 relative z-0">
-                  <div className="w-[1px] h-10 bg-[#333]"></div>
-                </div>
+                {/* Connection line */}
+                <div className="hidden md:block w-8 h-[1px] bg-[#f04b36] shadow-[0_0_10px_rgba(240,75,54,0.5)]"></div>
 
-                <div className="border border-[#333] bg-[#0a0a0a] p-6 relative group overflow-hidden">
-                  <div className="absolute top-0 left-0 w-1 h-full bg-[#333] group-hover:bg-white transition-colors"></div>
-                  <div className="flex items-center gap-4">
-                    <Database className="w-6 h-6 text-white" />
-                    <div>
-                      <h4 className="font-mono text-sm font-bold uppercase tracking-wider mb-1">Persistence Layer</h4>
-                      <p className="text-xs text-[#666]">Committed to PostgreSQL DB</p>
-                    </div>
+                {/* Cognitive Swarm */}
+                <div className="flex flex-col gap-4">
+                  <div className="border border-[#f04b36]/50 bg-[#f04b36]/10 p-4 text-center shadow-[0_0_20px_rgba(240,75,54,0.15)] relative overflow-hidden w-48">
+                    <div className="absolute top-0 left-0 w-1 h-full bg-[#f04b36]"></div>
+                    <Cpu className="w-5 h-5 text-[#f04b36] mx-auto mb-2" />
+                    <h4 className="font-mono text-xs font-bold uppercase tracking-wider text-[#f04b36]">Sentinel Agent</h4>
+                    <p className="text-[10px] text-[#f04b36]/70">Anomaly Scoring</p>
+                  </div>
+                  <div className="border border-[#333] bg-[#0a0a0a] p-4 text-center w-48 hover:border-white/50 transition-colors">
+                    <ScanSearch className="w-5 h-5 text-white mx-auto mb-2" />
+                    <h4 className="font-mono text-xs font-bold uppercase tracking-wider">Investigator</h4>
+                    <p className="text-[10px] text-[#666]">Root Cause</p>
+                  </div>
+                  <div className="border border-[#333] bg-[#0a0a0a] p-4 text-center w-48 hover:border-white/50 transition-colors">
+                    <BrainCircuit className="w-5 h-5 text-white mx-auto mb-2" />
+                    <h4 className="font-mono text-xs font-bold uppercase tracking-wider">Digital Twin</h4>
+                    <p className="text-[10px] text-[#666]">Simulation</p>
                   </div>
                 </div>
+
+                {/* Connection line */}
+                <div className="hidden md:block w-8 h-[1px] bg-[#f04b36] shadow-[0_0_10px_rgba(240,75,54,0.5)]"></div>
+
+                {/* Resolution */}
+                <div className="flex flex-col items-center gap-4">
+                  <div className="border border-[#333] bg-[#0a0a0a] p-4 text-center w-40">
+                    <Activity className="w-5 h-5 text-white mx-auto mb-2" />
+                    <h4 className="font-mono text-xs font-bold uppercase tracking-wider">Decision Engine</h4>
+                    <p className="text-[10px] text-[#666]">Action Selection</p>
+                  </div>
+                  <div className="h-6 w-[1px] bg-[#333]"></div>
+                  <div className="border border-[#333] bg-[#0a0a0a] p-4 text-center w-40 hover:bg-[#111] transition-colors relative group">
+                    <div className="absolute top-0 left-0 w-full h-1 bg-[#888] group-hover:bg-white transition-colors"></div>
+                    <Lock className="w-5 h-5 text-white mx-auto mb-2" />
+                    <h4 className="font-mono text-xs font-bold uppercase tracking-wider">Trust Ledger</h4>
+                    <p className="text-[10px] text-[#666]">Immutable Record</p>
+                  </div>
+                </div>
+
               </div>
             </div>
 
@@ -316,20 +335,44 @@ export default function Overview() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 divide-y md:divide-y-0 md:divide-x divide-[#222] border-b border-[#222]">
-            <div className="p-12 lg:p-16 hover:bg-[#111] transition-colors">
+            {/* Top Row */}
+            <div className="p-12 lg:p-16 hover:bg-[#111] transition-colors border-b border-[#222]">
               <Code2 className="w-10 h-10 text-white mb-8" />
-              <h3 className="font-medium text-2xl mb-4 tracking-tight">Next.js</h3>
-              <p className="text-[#888] leading-relaxed">High-performance React framework powering the operational dashboard.</p>
+              <h3 className="font-medium text-2xl mb-4 tracking-tight">Next.js & React</h3>
+              <p className="text-[#888] leading-relaxed">High-performance React framework powering the operational analyst dashboard.</p>
             </div>
-            <div className="p-12 lg:p-16 hover:bg-[#111] transition-colors">
+            <div className="p-12 lg:p-16 hover:bg-[#111] transition-colors border-b border-[#222]">
               <Server className="w-10 h-10 text-white mb-8" />
               <h3 className="font-medium text-2xl mb-4 tracking-tight">FastAPI</h3>
-              <p className="text-[#888] leading-relaxed">Asynchronous Python routing processing sub-millisecond API requests.</p>
+              <p className="text-[#888] leading-relaxed">Asynchronous Python routing processing sub-millisecond API telemetry requests.</p>
             </div>
-            <div className="p-12 lg:p-16 hover:bg-[#111] transition-colors group">
+            <div className="p-12 lg:p-16 hover:bg-[#111] transition-colors group border-b border-[#222]">
               <Fingerprint className="w-10 h-10 text-[#f04b36] mb-8 group-hover:scale-110 transition-transform origin-left" />
               <h3 className="font-medium text-2xl mb-4 tracking-tight text-[#f04b36]">Scikit-Learn</h3>
               <p className="text-[#888] leading-relaxed">Powering the highly accurate Isolation Forest anomaly detection models.</p>
+            </div>
+            <div className="p-12 lg:p-16 hover:bg-[#111] transition-colors border-b border-[#222]">
+              <Terminal className="w-10 h-10 text-white mb-8" />
+              <h3 className="font-medium text-2xl mb-4 tracking-tight">LangGraph</h3>
+              <p className="text-[#888] leading-relaxed">Cyclic graph orchestration framework managing the multi-agent cognitive swarm.</p>
+            </div>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 divide-y md:divide-y-0 md:divide-x divide-[#222] border-b border-[#222]">
+            {/* Bottom Row */}
+            <div className="p-12 lg:p-16 hover:bg-[#111] transition-colors">
+              <Network className="w-10 h-10 text-white mb-8" />
+              <h3 className="font-medium text-2xl mb-4 tracking-tight">Neo4j</h3>
+              <p className="text-[#888] leading-relaxed">Native graph database storing complex entity relationships and fraud rings.</p>
+            </div>
+            <div className="p-12 lg:p-16 hover:bg-[#111] transition-colors">
+              <BrainCircuit className="w-10 h-10 text-white mb-8" />
+              <h3 className="font-medium text-2xl mb-4 tracking-tight">Qdrant</h3>
+              <p className="text-[#888] leading-relaxed">High-performance vector database powering the Memory Cortex and RAG retrievals.</p>
+            </div>
+            <div className="p-12 lg:p-16 hover:bg-[#111] transition-colors">
+              <Activity className="w-10 h-10 text-white mb-8" />
+              <h3 className="font-medium text-2xl mb-4 tracking-tight">Apache Kafka</h3>
+              <p className="text-[#888] leading-relaxed">Distributed event streaming platform for real-time transactional ingestion.</p>
             </div>
             <div className="p-12 lg:p-16 hover:bg-[#111] transition-colors">
               <Database className="w-10 h-10 text-white mb-8" />
