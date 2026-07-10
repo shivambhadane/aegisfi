@@ -12,6 +12,12 @@ import lombok.Builder;
 public class TransactionRequest {
     private Double amount;
     @Builder.Default private String currency = "USD";
+
+    private String customer;
+    private String device;
+    private String agent;
+    private String merchant;
+    private String country;
     
     @Builder.Default private Double v1 = 0.0;
     @Builder.Default private Double v2 = 0.0;

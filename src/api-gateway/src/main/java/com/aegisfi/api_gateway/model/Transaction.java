@@ -35,6 +35,21 @@ public class Transaction {
     @Builder.Default
     private Integer riskScore = 0;
 
+    @Column
+    private String customer;
+
+    @Column
+    private String device;
+
+    @Column
+    private String agent;
+
+    @Column
+    private String merchant;
+
+    @Column
+    private String country;
+
     @Column(nullable = false)
     private LocalDateTime timestamp;
 

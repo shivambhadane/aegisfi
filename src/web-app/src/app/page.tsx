@@ -917,6 +917,14 @@ export default function Dashboard() {
                               <div>TYPE: Transaction (Root)</div>
                               <div>AMOUNT: ${selectedTx.amount}</div>
                               <div>SCORE: {selectedTx.risk_score}</div>
+                              {selectedTx.trust_score !== undefined && (
+                                <>
+                                  <div className="border-t border-slate-100 pt-1 mt-1 text-slate-800 font-bold">DNA METRICS:</div>
+                                  <div>TRUST SCORE: {selectedTx.trust_score}/100</div>
+                                  <div>SPENDING BEHAVIOR: {selectedTx.spending_behaviour}</div>
+                                  <div>RISK PROFILE: {selectedTx.risk_history}</div>
+                                </>
+                              )}
                             </>
                           )}
                           {selectedNode === "cust" && (
@@ -924,6 +932,14 @@ export default function Dashboard() {
                               <div>TYPE: Client Account</div>
                               <div>NAME: {selectedTx.customer}</div>
                               <div>ACC_STATUS: VERIFIED</div>
+                              {selectedTx.trust_score !== undefined && (
+                                <>
+                                  <div className="border-t border-slate-100 pt-1 mt-1 text-slate-800 font-bold">DNA METRICS:</div>
+                                  <div>TRUST SCORE: {selectedTx.trust_score}/100</div>
+                                  <div>BEHAVIOR: {selectedTx.spending_behaviour}</div>
+                                  <div>RISK RECORD: {selectedTx.risk_history}</div>
+                                </>
+                              )}
                             </>
                           )}
                           {selectedNode === "merch" && (
@@ -945,6 +961,14 @@ export default function Dashboard() {
                               <div>TYPE: Hardware Signature</div>
                               <div>MODEL: {selectedTx.device?.split(" (")[0]}</div>
                               <div>OS: macOS / Unix core</div>
+                              {selectedTx.trust_score !== undefined && (
+                                <>
+                                  <div className="border-t border-slate-100 pt-1 mt-1 text-slate-800 font-bold">DNA METRICS:</div>
+                                  <div>TRUST SCORE: {selectedTx.trust_score}/100</div>
+                                  <div>DEVICE HISTORY: {selectedTx.device_history}</div>
+                                  <div>LOGIN PATTERN: {selectedTx.login_pattern}</div>
+                                </>
+                              )}
                             </>
                           )}
                         </div>

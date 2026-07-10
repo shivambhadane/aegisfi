@@ -8,4 +8,7 @@ import java.util.List;
 @Repository
 public interface TransactionRepository extends JpaRepository<Transaction, Long> {
     List<Transaction> findAllByOrderByTimestampDesc();
+    List<Transaction> findAllByCustomerOrderByTimestampDesc(String customer);
+    List<Transaction> findAllByDeviceOrderByTimestampDesc(String device);
+    List<Transaction> findAllByAgentOrderByTimestampDesc(String agent);
 }
