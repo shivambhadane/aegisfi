@@ -484,33 +484,94 @@ export default function Dashboard() {
                   {/* SVG Map Illustration with High-Fidelity Continental outlines */}
                   <div className="relative w-full h-64 bg-slate-50 border border-slate-100 rounded-lg overflow-hidden flex items-center justify-center">
                     <svg viewBox="0 0 1000 500" className="w-full h-full opacity-90">
-                      <path d="M 0,100 L 1000,100 M 0,200 L 1000,200 M 0,300 L 1000,300 M 0,400 L 1000,400 M 200,0 L 200,500 M 400,0 L 400,500 M 600,0 L 600,500 M 800,0 L 800,500" fill="none" stroke="#e2e8f0" strokeWidth="1" strokeDasharray="3,3" />
+                      <style>{`
+                        @keyframes threat-dash {
+                          to {
+                            stroke-dashoffset: -40;
+                          }
+                        }
+                        @keyframes pulse-radar {
+                          0% {
+                            r: 3px;
+                            opacity: 1;
+                          }
+                          100% {
+                            r: 25px;
+                            opacity: 0;
+                          }
+                        }
+                        .animate-dash-red {
+                          stroke-dasharray: 8, 8;
+                          animation: threat-dash 1.5s linear infinite;
+                        }
+                        .animate-dash-amber {
+                          stroke-dasharray: 6, 10;
+                          animation: threat-dash 2s linear infinite;
+                        }
+                        .animate-dash-green {
+                          stroke-dasharray: 10, 6;
+                          animation: threat-dash 2.5s linear infinite;
+                        }
+                        .pulse-ring {
+                          animation: pulse-radar 2s cubic-bezier(0.215, 0.610, 0.355, 1) infinite;
+                          transform-origin: center;
+                        }
+                      `}</style>
+
+                      {/* Map Grid overlay */}
+                      <path d="M 0,50 L 1000,50 M 0,100 L 1000,100 M 0,150 L 1000,150 M 0,200 L 1000,200 M 0,250 L 1000,250 M 0,300 L 1000,300 M 0,350 L 1000,350 M 0,400 L 1000,400 M 0,450 L 1000,450 M 100,0 L 100,500 M 200,0 L 200,500 M 300,0 L 300,500 M 400,0 L 400,500 M 500,0 L 500,500 M 600,0 L 600,500 M 700,0 L 700,500 M 800,0 L 800,500 M 900,0 L 900,500" fill="none" stroke="#f1f5f9" strokeWidth="0.8" />
                       
-                      {/* Stylized Continental Outlines */}
+                      {/* Stylized high-fidelity continental outlines */}
                       {/* North America */}
-                      <path d="M 120,120 L 280,100 L 240,240 L 190,260 L 170,220 Z" fill="#e2e8f0" stroke="#cbd5e1" strokeWidth="1.5" />
+                      <path d="M 100,100 C 130,80 180,80 200,90 C 220,100 240,80 280,90 C 290,130 260,170 230,190 C 210,210 200,240 180,260 C 160,250 150,210 140,200 C 110,200 90,170 80,150 C 70,130 90,110 100,100 Z" fill="#e2e8f0" stroke="#cbd5e1" strokeWidth="1.2" />
                       {/* South America */}
-                      <path d="M 190,260 L 230,290 L 250,380 L 220,440 L 190,340 Z" fill="#e2e8f0" stroke="#cbd5e1" strokeWidth="1.5" />
+                      <path d="M 180,260 C 210,270 230,300 240,330 C 250,370 230,430 200,470 C 190,460 180,420 170,390 C 160,360 150,330 150,300 C 150,270 170,260 180,260 Z" fill="#e2e8f0" stroke="#cbd5e1" strokeWidth="1.2" />
+                      {/* Greenland */}
+                      <path d="M 280,50 C 310,45 330,60 310,85 C 290,95 270,85 280,50 Z" fill="#e2e8f0" stroke="#cbd5e1" strokeWidth="1.2" />
                       {/* Africa */}
-                      <path d="M 450,220 L 540,200 L 570,260 L 520,380 L 470,300 Z" fill="#e2e8f0" stroke="#cbd5e1" strokeWidth="1.5" />
+                      <path d="M 460,220 C 500,210 540,220 560,250 C 580,290 575,340 540,390 C 520,410 500,430 490,410 C 480,390 470,330 450,300 C 440,280 440,240 460,220 Z" fill="#e2e8f0" stroke="#cbd5e1" strokeWidth="1.2" />
                       {/* Eurasia */}
-                      <path d="M 420,100 L 680,60 L 780,120 L 720,240 L 570,260 L 450,220 Z" fill="#e2e8f0" stroke="#cbd5e1" strokeWidth="1.5" />
+                      <path d="M 400,120 C 450,110 500,90 560,95 C 620,100 700,70 790,80 C 830,90 850,110 860,140 C 850,180 810,220 780,240 C 760,250 720,290 680,270 C 650,250 620,230 580,240 C 540,250 510,230 470,220 C 440,210 420,180 400,160 C 380,140 380,130 400,120 Z" fill="#e2e8f0" stroke="#cbd5e1" strokeWidth="1.2" />
+                      {/* India / SE Asia */}
+                      <path d="M 620,230 C 635,230 650,250 660,270 C 670,290 690,300 720,290 C 740,300 760,330 740,350 C 710,360 690,320 670,300 C 650,280 635,260 620,240 Z" fill="#e2e8f0" stroke="#cbd5e1" strokeWidth="1.2" />
                       {/* Australia */}
-                      <path d="M 750,320 L 820,340 L 800,390 L 740,370 Z" fill="#e2e8f0" stroke="#cbd5e1" strokeWidth="1.5" />
-                      
-                      {/* Trajectory vector endpoints */}
-                      <circle cx="220" cy="190" r="6" fill="#ef4444" />
-                      <circle cx="220" cy="190" r="14" fill="none" stroke="#ef4444" strokeWidth="1.5" className="animate-ping" />
-                      
-                      <circle cx="500" cy="150" r="4" fill="#0f172a" />
-                      <circle cx="720" cy="210" r="6" fill="#f59e0b" />
-                      <circle cx="720" cy="210" r="14" fill="none" stroke="#f59e0b" strokeWidth="1.5" className="animate-ping" />
+                      <path d="M 780,360 C 820,350 850,360 870,390 C 880,420 850,450 820,440 C 790,430 765,400 780,360 Z" fill="#e2e8f0" stroke="#cbd5e1" strokeWidth="1.2" />
+                      {/* Japan */}
+                      <path d="M 870,130 C 880,140 885,160 880,185 C 875,170 870,150 870,130 Z" fill="#e2e8f0" stroke="#cbd5e1" strokeWidth="1.2" />
+                      {/* Great Britain */}
+                      <path d="M 400,130 C 405,125 410,130 405,140 Z" fill="#e2e8f0" stroke="#cbd5e1" strokeWidth="1.2" />
 
-                      <circle cx="780" cy="260" r="4" fill="#10b981" />
+                      {/* Hotspots & Radar Sweeps */}
+                      {/* NY Hotspot */}
+                      <circle cx="170" cy="130" r="4" fill="#ef4444" />
+                      <circle cx="170" cy="130" r="15" fill="none" stroke="#ef4444" strokeWidth="1" className="pulse-ring" />
+                      <text x="170" y="120" fontSize="7" fontWeight="bold" fill="#475569" textAnchor="middle" fontFamily="monospace">US-EAST</text>
 
-                      {/* Animated dasharray paths representing routing */}
-                      <path d="M 220,190 Q 360,110 500,150" fill="none" stroke="#ef4444" strokeWidth="2.5" strokeDasharray="5,5" />
-                      <path d="M 720,210 Q 750,230 780,260" fill="none" stroke="#f59e0b" strokeWidth="2.5" strokeDasharray="5,5" />
+                      {/* Frankfurt Hotspot */}
+                      <circle cx="450" cy="140" r="4" fill="#f59e0b" />
+                      <circle cx="450" cy="140" r="15" fill="none" stroke="#f59e0b" strokeWidth="1" className="pulse-ring" />
+                      <text x="450" y="130" fontSize="7" fontWeight="bold" fill="#475569" textAnchor="middle" fontFamily="monospace">EU-WEST</text>
+
+                      {/* Beijing Hotspot */}
+                      <circle cx="760" cy="120" r="4" fill="#ef4444" />
+                      <circle cx="760" cy="120" r="15" fill="none" stroke="#ef4444" strokeWidth="1" className="pulse-ring" />
+                      <text x="760" y="110" fontSize="7" fontWeight="bold" fill="#475569" textAnchor="middle" fontFamily="monospace">AS-EAST</text>
+
+                      {/* Bangalore Swarm Safe Node */}
+                      <circle cx="640" cy="240" r="5" fill="#10b981" />
+                      <circle cx="640" cy="240" r="12" fill="none" stroke="#10b981" strokeWidth="1.5" opacity="0.6" />
+                      <text x="640" y="255" fontSize="7" fontWeight="bold" fill="#10b981" textAnchor="middle" fontFamily="monospace">IN-HQ (SAFE)</text>
+
+                      {/* Attack & swarm routing vector arcs */}
+                      {/* Beijing -> US-East (Threat vector 1) */}
+                      <path d="M 760,120 Q 465,50 170,130" fill="none" stroke="#ef4444" strokeWidth="2" className="animate-dash-red" />
+                      
+                      {/* Singapore -> EU-West (Threat vector 2) */}
+                      <path d="M 690,290 Q 570,180 450,140" fill="none" stroke="#f59e0b" strokeWidth="1.5" className="animate-dash-amber" />
+
+                      {/* India -> US-West (Safe Swarm tunnel) */}
+                      <path d="M 640,240 Q 375,280 110,150" fill="none" stroke="#10b981" strokeWidth="1.5" className="animate-dash-green" />
+                      <text x="375" y="240" fontSize="8" fontWeight="bold" fill="#10b981" opacity="0.8" textAnchor="middle" fontFamily="monospace">SECURE TUNNEL A-4</text>
                     </svg>
 
                     <div className="absolute bottom-4 left-4 bg-white/95 border border-slate-200 p-3 rounded font-mono text-[10px] text-slate-500 space-y-1 shadow-sm">
