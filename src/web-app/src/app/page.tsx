@@ -10,7 +10,6 @@ import {
   Fingerprint, 
   Activity, 
   RefreshCw,
-  ChevronRight,
   Plus,
   Search,
   Layers,
@@ -20,7 +19,8 @@ import {
   FileCheck2,
   Lock,
   Clock,
-  FileSpreadsheet
+  FileSpreadsheet,
+  ChevronRight
 } from "lucide-react";
 
 interface Transaction {
@@ -58,6 +58,8 @@ export default function Dashboard() {
   const [minRisk, setMinRisk] = useState<number>(0);
   const [filterStatus, setFilterStatus] = useState<string>("ALL");
 
+  // Console CLI state
+  const [cmdInput, setCmdInput] = useState("");
   const [logs, setLogs] = useState<string[]>([
     "sys_init // aegis-fi trust core swarm initialized // standby",
     "kafka_stream // channel ingress: transactions.main // established (9092)",
@@ -242,6 +244,24 @@ export default function Dashboard() {
     }
   };
 
+  const handleCmdSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!cmdInput.trim()) return;
+    const command = cmdInput.trim().toLowerCase();
+    addLog(`cli_command // executing: ${command}`);
+    
+    if (command === "clear") {
+      setLogs([]);
+    } else if (command === "simulate") {
+      handleSimulateTransaction();
+    } else if (command === "status") {
+      addLog("system_status // env: production // sentinel: active // database: connected");
+    } else {
+      addLog(`cli_error // unrecognized command: "${command}". type "simulate", "status", or "clear".`);
+    }
+    setCmdInput("");
+  };
+
   const getMockFeatures = (txId: number, amount: number) => {
     const features: { name: string; value: number }[] = [];
     for (let i = 1; i <= 28; i++) {
@@ -266,6 +286,24 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-white text-slate-800 font-sans flex overflow-hidden select-none selection:bg-slate-100">
       
+      {/* SVG Definitions for Gradients */}
+      <svg className="hidden">
+        <defs>
+          <linearGradient id="sparkline-blue" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.4" />
+            <stop offset="100%" stopColor="#3b82f6" stopOpacity="0.0" />
+          </linearGradient>
+          <linearGradient id="sparkline-emerald" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#10b981" stopOpacity="0.4" />
+            <stop offset="100%" stopColor="#10b981" stopOpacity="0.0" />
+          </linearGradient>
+          <linearGradient id="sparkline-red" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#ef4444" stopOpacity="0.4" />
+            <stop offset="100%" stopColor="#ef4444" stopOpacity="0.0" />
+          </linearGradient>
+        </defs>
+      </svg>
+
       {/* 1. Left Navigation Sidebar */}
       <aside className="w-64 bg-slate-50 border-r border-slate-200 flex flex-col justify-between shrink-0">
         <div>
@@ -346,7 +384,7 @@ export default function Dashboard() {
       {/* Main Workspace Frame */}
       <main className="flex-1 flex flex-col justify-between overflow-hidden">
         
-        {/* 2. Top Intelligence Header */}
+        {/* 2. Top Header */}
         <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-6 shrink-0">
           {/* Global Search */}
           <div className="flex items-center gap-3 w-96 relative">
@@ -392,25 +430,29 @@ export default function Dashboard() {
               {/* KPI Metrics */}
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                 {[
-                  { label: "Transactions Today", val: `${transactions.length * 12 + 1042}`, change: "+14.8%", color: "text-slate-900", strokeColor: "#0f172a" },
-                  { label: "Transactions / Sec", val: `${tps.toFixed(1)}/s`, change: "+2.1%", color: "text-slate-700", strokeColor: "#475569" },
-                  { label: "Fraud Alerts Count", val: `${alertsCount}`, change: "-3.5%", color: "text-red-650 text-red-600", strokeColor: "#ef4444" },
-                  { label: "Capital Protected", val: `$${moneyProtected.toLocaleString()}`, change: "+$2.4k/m", color: "text-emerald-600", strokeColor: "#10b981" }
+                  { label: "Transactions Today", val: `${transactions.length * 12 + 1042}`, change: "+14.8%", color: "text-slate-900", strokeColor: "#3b82f6", gradId: "url(#sparkline-blue)" },
+                  { label: "Transactions / Sec", val: `${tps.toFixed(1)}/s`, change: "+2.1%", color: "text-slate-700", strokeColor: "#10b981", gradId: "url(#sparkline-emerald)" },
+                  { label: "Fraud Alerts Count", val: `${alertsCount}`, change: "-3.5%", color: "text-red-650 text-red-600", strokeColor: "#ef4444", gradId: "url(#sparkline-red)" },
+                  { label: "Capital Protected", val: `$${moneyProtected.toLocaleString()}`, change: "+$2.4k/m", color: "text-emerald-600", strokeColor: "#10b981", gradId: "url(#sparkline-emerald)" }
                 ].map((kpi, idx) => (
-                  <div key={idx} className="bg-white border border-slate-200 rounded-lg p-4 relative flex flex-col justify-between h-24">
-                    <div className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">{kpi.label}</div>
-                    <div className="flex items-baseline justify-between mt-1">
+                  <div key={idx} className="bg-white border border-slate-200 rounded-lg p-4 relative flex flex-col justify-between h-24 overflow-hidden">
+                    <div className="text-[10px] uppercase font-bold text-slate-400 tracking-wider z-10">{kpi.label}</div>
+                    <div className="flex items-baseline justify-between mt-1 z-10">
                       <span className={`text-xl font-bold font-mono ${kpi.color}`}>{kpi.val}</span>
                       <span className="text-[9px] text-slate-400 font-semibold">{kpi.change}</span>
                     </div>
-                    {/* Sparkline SVG */}
-                    <div className="absolute right-4 bottom-3 w-16 h-6 opacity-60">
-                      <svg viewBox="0 0 100 30" className="w-full h-full">
+                    {/* Sparkline SVG with Gradient Area */}
+                    <div className="absolute right-0 bottom-0 left-0 h-10 opacity-70 z-0">
+                      <svg viewBox="0 0 100 30" className="w-full h-full" preserveAspectRatio="none">
+                        <path
+                          d={`M 0,30 L 0,20 L 20,15 L 40,22 L 60,10 L 80,18 L 100,5 L 100,30 Z`}
+                          fill={kpi.gradId}
+                        />
                         <polyline
                           fill="none"
                           stroke={kpi.strokeColor}
-                          strokeWidth="2"
-                          points={[20, 35, 25, 45, 30, 60].map((val, i) => `${i * 20},${30 - val / 2.5}`).join(" ")}
+                          strokeWidth="1.5"
+                          points={`0,20 20,15 40,22 60,10 80,18 100,5`}
                         />
                       </svg>
                     </div>
@@ -431,17 +473,24 @@ export default function Dashboard() {
                     </div>
                   </div>
 
-                  {/* SVG Map Illustration with Live Vectors */}
+                  {/* SVG Map Illustration with High-Fidelity Continental outlines */}
                   <div className="relative w-full h-64 bg-slate-50 border border-slate-100 rounded-lg overflow-hidden flex items-center justify-center">
-                    <svg viewBox="0 0 1000 500" className="w-full h-full opacity-80">
+                    <svg viewBox="0 0 1000 500" className="w-full h-full opacity-90">
                       <path d="M 0,100 L 1000,100 M 0,200 L 1000,200 M 0,300 L 1000,300 M 0,400 L 1000,400 M 200,0 L 200,500 M 400,0 L 400,500 M 600,0 L 600,500 M 800,0 L 800,500" fill="none" stroke="#e2e8f0" strokeWidth="1" strokeDasharray="3,3" />
                       
-                      <circle cx="200" cy="180" r="40" fill="none" stroke="#cbd5e1" strokeWidth="2" strokeDasharray="2,5" />
-                      <circle cx="230" cy="220" r="30" fill="none" stroke="#cbd5e1" strokeWidth="2" strokeDasharray="2,5" />
-                      <circle cx="480" cy="140" r="35" fill="none" stroke="#cbd5e1" strokeWidth="2" strokeDasharray="2,5" />
-                      <circle cx="530" cy="160" r="45" fill="none" stroke="#cbd5e1" strokeWidth="2" strokeDasharray="2,5" />
-                      <circle cx="750" cy="200" r="50" fill="none" stroke="#cbd5e1" strokeWidth="2" strokeDasharray="2,5" />
+                      {/* Stylized Continental Outlines */}
+                      {/* North America */}
+                      <path d="M 120,120 L 280,100 L 240,240 L 190,260 L 170,220 Z" fill="#e2e8f0" stroke="#cbd5e1" strokeWidth="1.5" />
+                      {/* South America */}
+                      <path d="M 190,260 L 230,290 L 250,380 L 220,440 L 190,340 Z" fill="#e2e8f0" stroke="#cbd5e1" strokeWidth="1.5" />
+                      {/* Africa */}
+                      <path d="M 450,220 L 540,200 L 570,260 L 520,380 L 470,300 Z" fill="#e2e8f0" stroke="#cbd5e1" strokeWidth="1.5" />
+                      {/* Eurasia */}
+                      <path d="M 420,100 L 680,60 L 780,120 L 720,240 L 570,260 L 450,220 Z" fill="#e2e8f0" stroke="#cbd5e1" strokeWidth="1.5" />
+                      {/* Australia */}
+                      <path d="M 750,320 L 820,340 L 800,390 L 740,370 Z" fill="#e2e8f0" stroke="#cbd5e1" strokeWidth="1.5" />
                       
+                      {/* Trajectory vector endpoints */}
                       <circle cx="220" cy="190" r="6" fill="#ef4444" />
                       <circle cx="220" cy="190" r="14" fill="none" stroke="#ef4444" strokeWidth="1.5" className="animate-ping" />
                       
@@ -451,8 +500,9 @@ export default function Dashboard() {
 
                       <circle cx="780" cy="260" r="4" fill="#10b981" />
 
-                      <path d="M 220,190 Q 360,110 500,150" fill="none" stroke="#ef4444" strokeWidth="2" strokeDasharray="5,5" />
-                      <path d="M 720,210 Q 750,230 780,260" fill="none" stroke="#f59e0b" strokeWidth="2" strokeDasharray="5,5" />
+                      {/* Animated dasharray paths representing routing */}
+                      <path d="M 220,190 Q 360,110 500,150" fill="none" stroke="#ef4444" strokeWidth="2.5" strokeDasharray="5,5" />
+                      <path d="M 720,210 Q 750,230 780,260" fill="none" stroke="#f59e0b" strokeWidth="2.5" strokeDasharray="5,5" />
                     </svg>
 
                     <div className="absolute bottom-4 left-4 bg-white/95 border border-slate-200 p-3 rounded font-mono text-[10px] text-slate-500 space-y-1 shadow-sm">
@@ -471,15 +521,23 @@ export default function Dashboard() {
                     <p className="text-[10px] text-slate-400">Classification distribution over 24H swarm data.</p>
                   </div>
 
-                  {/* SVG Bar Chart */}
-                  <div className="h-48 w-full mt-4 flex items-end justify-between px-2">
+                  {/* SVG Bar Chart with Horizontal Gridlines */}
+                  <div className="h-48 w-full mt-4 relative flex items-end justify-between px-2">
+                    {/* Gridlines */}
+                    <div className="absolute inset-0 flex flex-col justify-between pointer-events-none opacity-40">
+                      <div className="border-b border-slate-200 w-full h-px"></div>
+                      <div className="border-b border-slate-200 w-full h-px"></div>
+                      <div className="border-b border-slate-200 w-full h-px"></div>
+                      <div className="border-b border-slate-200 w-full h-px"></div>
+                    </div>
+
                     {[
                       { label: "IP Shift", height: 75, count: "482", color: "bg-slate-700" },
                       { label: "OTP Bypass", height: 95, count: "612", color: "bg-red-500" },
                       { label: "Velocity", height: 45, count: "294", color: "bg-slate-400" },
                       { label: "Device Incompat", height: 60, count: "389", color: "bg-amber-500" }
                     ].map((bar, i) => (
-                      <div key={i} className="flex flex-col items-center gap-2 flex-1">
+                      <div key={i} className="flex flex-col items-center gap-2 flex-1 z-10">
                         <span className="text-[9px] font-mono text-slate-500">{bar.count}</span>
                         <div className="w-8 bg-slate-100 rounded-t-sm relative h-32 flex items-end">
                           <div className={`w-full rounded-t-sm ${bar.color}`} style={{ height: `${bar.height}%` }} />
@@ -663,7 +721,7 @@ export default function Dashboard() {
 
               <div className="lg:col-span-3 bg-white border border-slate-200 rounded-lg p-5 space-y-4">
                 <div className="border-b border-slate-200 pb-3">
-                  <h3 className="text-xs uppercase font-bold text-slate-855 text-slate-800 tracking-wider">Ingress Controls</h3>
+                  <h3 className="text-xs uppercase font-bold text-slate-800 tracking-wider">Ingress Controls</h3>
                   <p className="text-[10px] text-slate-400 mt-1">Manual security overriding and case dispatch options.</p>
                 </div>
 
@@ -694,7 +752,7 @@ export default function Dashboard() {
                           setTransactions(prev => prev.map(t => t.id === selectedTx.id ? { ...t, status: "FLAGGED" } : t));
                           setSelectedTx(prev => prev ? { ...prev, status: "FLAGGED" } : null);
                         }}
-                        className="w-full bg-red-600 hover:bg-red-750 hover:bg-red-700 text-white font-bold py-2 rounded-md text-[11px] uppercase tracking-wider transition-colors shadow-sm"
+                        className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 rounded-md text-[11px] uppercase tracking-wider transition-colors shadow-sm"
                       >
                         Force Quarantine Block
                       </button>
@@ -757,7 +815,7 @@ export default function Dashboard() {
                       </div>
                     </div>
 
-                    {/* Interactive Neo4j-inspired SVG Knowledge Graph */}
+                    {/* Interactive Neo4j-inspired SVG Knowledge Graph with Labeled Edges */}
                     <div className="bg-white border border-slate-200 rounded-lg p-5">
                       <div className="flex justify-between items-center mb-4 border-b border-slate-200 pb-3">
                         <div>
@@ -780,10 +838,11 @@ export default function Dashboard() {
                         </div>
                       </div>
 
-                      {/* SVG Nodes & Edges */}
+                      {/* SVG Nodes & Edges with Edge Labels */}
                       <div className="w-full h-80 bg-slate-50 border border-slate-100 rounded-lg relative flex items-center justify-center overflow-hidden">
                         <svg viewBox="0 0 800 400" className="w-full h-full">
                           
+                          {/* Edges */}
                           <line x1="400" y1="200" x2="250" y2="100" stroke={selectedNode === "cust" ? "#0f172a" : "#cbd5e1"} strokeWidth="1.5" />
                           <line x1="400" y1="200" x2="550" y2="100" stroke={selectedNode === "merch" ? "#0f172a" : "#cbd5e1"} strokeWidth="1.5" />
                           <line x1="400" y1="200" x2="300" y2="300" stroke={selectedNode === "ip" ? "#0f172a" : "#cbd5e1"} strokeWidth="1.5" />
@@ -797,6 +856,26 @@ export default function Dashboard() {
                             </>
                           )}
 
+                          {/* Edge Relationship Labels */}
+                          <g fill="#94a3b8" fontSize="7" fontWeight="bold" fontFamily="monospace" textAnchor="middle">
+                            {/* TX -> CUST */}
+                            <rect x="310" y="142" width="34" height="10" rx="2" fill="#f1f5f9" />
+                            <text x="327" y="149">accounts</text>
+
+                            {/* TX -> MERCH */}
+                            <rect x="456" y="142" width="38" height="10" rx="2" fill="#f1f5f9" />
+                            <text x="475" y="149">routes to</text>
+
+                            {/* TX -> IP */}
+                            <rect x="330" y="242" width="38" height="10" rx="2" fill="#f1f5f9" />
+                            <text x="349" y="249">relayed IP</text>
+
+                            {/* TX -> DEV */}
+                            <rect x="424" y="242" width="48" height="10" rx="2" fill="#f1f5f9" />
+                            <text x="448" y="249">authorized on</text>
+                          </g>
+
+                          {/* Nodes */}
                           <g onClick={() => setSelectedNode("tx")} className="cursor-pointer">
                             <circle cx="400" cy="200" r="22" fill="#ffffff" stroke="#000000" strokeWidth="2.5" />
                             <text x="400" y="204" textAnchor="middle" fill="#0f172a" fontSize="9" fontWeight="bold" fontFamily="monospace">TX</text>
@@ -903,7 +982,7 @@ export default function Dashboard() {
                             </span>
                           ) : (
                             <span>
-                              [inlier check verified] feature space projection mapped closely to standard clusters. anomaly index parameters satisfied model thresholds.
+                              [inlier check verified] feature space projection mapped closely to standard clusters. Anomaly index parameters satisfied model thresholds.
                             </span>
                           )}
                         </p>
@@ -1021,7 +1100,7 @@ export default function Dashboard() {
               
               <div className="lg:col-span-8 bg-white border border-slate-200 rounded-lg p-6 space-y-6">
                 <div>
-                  <h3 className="text-xs uppercase font-bold text-slate-855 text-slate-800 tracking-wider">Immutable Decision Chain (Trust Ledger)</h3>
+                  <h3 className="text-xs uppercase font-bold text-slate-800 tracking-wider">Immutable Decision Chain (Trust Ledger)</h3>
                   <p className="text-[10px] text-slate-400 mt-1">Blockchain tracking timeline of internal AI and analyst governance signatures.</p>
                 </div>
 
@@ -1088,8 +1167,8 @@ export default function Dashboard() {
 
         </div>
 
-        {/* 4. Bottom Panel: Live Running Console System Logs */}
-        <div className="bg-slate-50 border-t border-slate-200 p-4 h-[130px] flex flex-col font-mono shrink-0">
+        {/* 4. Bottom Panel: Live Running Console System Logs with Simulated Command Prompt */}
+        <div className="bg-slate-50 border-t border-slate-200 p-4 h-[155px] flex flex-col font-mono shrink-0">
           <div className="text-[10px] text-slate-400 uppercase font-black tracking-wider pb-2 border-b border-slate-200 flex justify-between select-none">
             <span className="flex items-center gap-1.5">
               <Terminal className="w-3.5 h-3.5 text-slate-500" /> 
@@ -1097,6 +1176,7 @@ export default function Dashboard() {
             </span>
             <span className="text-[9px] text-slate-500 font-bold">connected // tty1</span>
           </div>
+          
           <div 
             ref={logContainerRef}
             className="flex-1 overflow-y-auto mt-2 space-y-1 text-[11px] text-slate-500 scrollbar-thin scrollbar-thumb-slate-200 scrollbar-track-transparent"
@@ -1108,6 +1188,18 @@ export default function Dashboard() {
               </div>
             ))}
           </div>
+
+          {/* Simulated Interactive CLI Prompt */}
+          <form onSubmit={handleCmdSubmit} className="mt-2 border-t border-slate-200/80 pt-2 flex items-center gap-2">
+            <span className="text-[11px] text-slate-400 font-bold select-none">$ aegis-fi &gt;</span>
+            <input
+              type="text"
+              value={cmdInput}
+              onChange={(e) => setCmdInput(e.target.value)}
+              placeholder="type 'simulate', 'status', or 'clear'..."
+              className="flex-1 bg-transparent text-[11px] text-slate-700 outline-none border-none placeholder-slate-400 font-mono"
+            />
+          </form>
         </div>
 
       </main>
