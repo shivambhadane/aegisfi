@@ -1,0 +1,11 @@
+/home/shivam/Desktop/aegisfi/backend/gateway/src/main/java/com/aegisfi/api_gateway/ApiGatewayApplication.java
+/home/shivam/Desktop/aegisfi/backend/gateway/src/main/java/com/aegisfi/api_gateway/controller/TransactionController.java
+/home/shivam/Desktop/aegisfi/backend/gateway/src/main/java/com/aegisfi/api_gateway/dto/FinancialProfile.java
+/home/shivam/Desktop/aegisfi/backend/gateway/src/main/java/com/aegisfi/api_gateway/dto/SentinelScoreRequest.java
+/home/shivam/Desktop/aegisfi/backend/gateway/src/main/java/com/aegisfi/api_gateway/dto/SentinelScoreResponse.java
+/home/shivam/Desktop/aegisfi/backend/gateway/src/main/java/com/aegisfi/api_gateway/dto/TransactionRequest.java
+/home/shivam/Desktop/aegisfi/backend/gateway/src/main/java/com/aegisfi/api_gateway/dto/TransactionResponse.java
+/home/shivam/Desktop/aegisfi/backend/gateway/src/main/java/com/aegisfi/api_gateway/model/Transaction.java
+/home/shivam/Desktop/aegisfi/backend/gateway/src/main/java/com/aegisfi/api_gateway/repository/TransactionRepository.java
+/home/shivam/Desktop/aegisfi/backend/gateway/src/main/java/com/aegisfi/api_gateway/service/FinancialDnaEngine.java
+/home/shivam/Desktop/aegisfi/backend/gateway/src/main/java/com/aegisfi/api_gateway/service/SentinelClient.java

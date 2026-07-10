@@ -1,0 +1,5 @@
+spring:
+  application:
+    name: memory-cortex-service
+  profiles:
+    active: dev

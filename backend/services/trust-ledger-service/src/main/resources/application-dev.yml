@@ -1,0 +1,10 @@
+server:
+  port: 8080
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5433/aegis_db
+    username: aegis_user
+    password: aegis_password
+  jpa:
+    hibernate:
+      ddl-auto: update

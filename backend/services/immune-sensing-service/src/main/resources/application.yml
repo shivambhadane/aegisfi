@@ -1,0 +1,5 @@
+spring:
+  application:
+    name: immune-sensing-service
+  profiles:
+    active: dev
