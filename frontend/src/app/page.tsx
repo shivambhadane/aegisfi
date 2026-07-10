@@ -36,6 +36,14 @@ interface Transaction {
   country?: string;
   category?: string;
   agent?: string;
+  recommended_action?: string;
+  recommended_action_reason?: string;
+  projected_fraud_loss?: number;
+  customer_friction?: string;
+  revenue_impact?: number;
+  compliance_status?: string;
+  memory_similarity?: string;
+  shared_device_count?: number;
 }
 
 export default function Dashboard() {
@@ -1067,12 +1075,71 @@ export default function Dashboard() {
                 </p>
               </div>
 
+              {selectedTx && (
+                <div className="bg-slate-50 border border-slate-200 p-4 rounded-lg font-mono text-[11px] text-slate-600 space-y-1.5 shadow-sm">
+                  <div className="flex justify-between items-center border-b border-slate-200/50 pb-2">
+                    <span className="text-slate-800 font-bold uppercase tracking-wider flex items-center gap-1.5">
+                      <Terminal className="w-3.5 h-3.5 text-slate-500" />
+                      Dynamic Decision Core Analysis
+                    </span>
+                    <span className="text-[9px] bg-slate-900 text-white font-bold px-1.5 py-0.5 rounded-sm">
+                      {selectedTx.recommended_action}
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-1">
+                    <div>
+                      <span className="text-slate-400 font-bold">REASON FACTORS:</span>
+                      <p className="text-slate-700 font-sans font-medium mt-0.5">{selectedTx.recommended_action_reason || "All anomaly checks cleared successfully."}</p>
+                    </div>
+                    <div>
+                      <span className="text-slate-400 font-bold">KNOWLEDGE GRAPH ANOMALY:</span>
+                      <p className="text-slate-700 mt-0.5">{selectedTx.shared_device_count || 0} shared device collisions detected.</p>
+                    </div>
+                    <div>
+                      <span className="text-slate-400 font-bold">MEMORY CORTEX SIMILARITY:</span>
+                      <p className="text-slate-700 mt-0.5">{selectedTx.memory_similarity || "95.0%"} pattern proximity.</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                {[
+                {(selectedTx ? [
+                  {
+                    title: "APPROVE",
+                    loss: `$${(selectedTx.amount * (selectedTx.risk_score / 100.0)).toFixed(2)} (Proj)`,
+                    friction: "Low",
+                    fraud: `${selectedTx.risk_score.toFixed(0)}%`,
+                    compliance: selectedTx.compliance_status || "GREEN",
+                    revenue: `+$${(selectedTx.amount * 0.0025).toFixed(2)}`,
+                    desc: "Release transaction code to standard ledger clearing.",
+                    highlighted: selectedTx.recommended_action === "APPROVE"
+                  },
+                  {
+                    title: "OTP CHALLENGE",
+                    loss: `$${(selectedTx.amount * (selectedTx.risk_score / 100.0) * 0.05).toFixed(2)} (Proj)`,
+                    friction: "Medium/High",
+                    fraud: `${(selectedTx.risk_score * 0.05).toFixed(1)}%`,
+                    compliance: "GREEN",
+                    revenue: `$${(selectedTx.amount * 0.0025 - 1.10).toFixed(2)}`,
+                    desc: "Require hardware cryptographic signature check.",
+                    highlighted: selectedTx.recommended_action === "OTP_CHALLENGE"
+                  },
+                  {
+                    title: "FREEZE ACCOUNT",
+                    loss: "$0.00",
+                    friction: "Critical",
+                    fraud: "0.0%",
+                    compliance: selectedTx.compliance_status || "GREEN",
+                    revenue: `-$${(selectedTx.amount * 0.025).toFixed(2)} (Loss)`,
+                    desc: "Lock customer profile and freeze all target routing nodes.",
+                    highlighted: selectedTx.recommended_action === "FREEZE"
+                  }
+                ] : [
                   { title: "APPROVE", loss: "$4,500 (Proj)", friction: "Low", fraud: "94.2%", compliance: "Green", revenue: "+$12.50", desc: "Release transaction code to standard ledger clearing.", highlighted: false },
                   { title: "OTP CHALLENGE", loss: "$120 (Proj)", friction: "Medium/High", fraud: "1.2%", compliance: "Green", revenue: "-$1.10", desc: "Require hardware cryptographic signature check.", highlighted: true },
                   { title: "FREEZE ACCOUNT", loss: "$0.00", friction: "Critical", fraud: "0.0%", compliance: "Amber (Risk)", revenue: "-$240.00 (Loss)", desc: "Lock customer profile and freeze all target routing nodes.", highlighted: false }
-                ].map((twin, idx) => (
+                ]).map((twin, idx) => (
                   <div 
                     key={idx} 
                     className={`bg-white border rounded-lg p-5 space-y-4 flex flex-col justify-between ${

@@ -42,6 +42,30 @@ public class TransactionResponse {
     @JsonProperty("risk_history")
     private String riskHistory;
 
+    @JsonProperty("recommended_action")
+    private String recommendedAction;
+
+    @JsonProperty("recommended_action_reason")
+    private String recommendedActionReason;
+
+    @JsonProperty("projected_fraud_loss")
+    private Double projectedFraudLoss;
+
+    @JsonProperty("customer_friction")
+    private String customerFriction;
+
+    @JsonProperty("revenue_impact")
+    private Double revenueImpact;
+
+    @JsonProperty("compliance_status")
+    private String complianceStatus;
+
+    @JsonProperty("memory_similarity")
+    private String memorySimilarity;
+
+    @JsonProperty("shared_device_count")
+    private Integer sharedDeviceCount;
+
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'", timezone = "UTC")
     private LocalDateTime timestamp;
 }

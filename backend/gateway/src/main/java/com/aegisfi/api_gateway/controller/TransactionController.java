@@ -24,12 +24,14 @@ public class TransactionController {
     private final TransactionRepository transactionRepository;
     private final SentinelClient sentinelClient;
     private final FinancialDnaEngine financialDnaEngine;
+    private final com.aegisfi.api_gateway.service.DecisionEngine decisionEngine;
 
     @Autowired
-    public TransactionController(TransactionRepository transactionRepository, SentinelClient sentinelClient, FinancialDnaEngine financialDnaEngine) {
+    public TransactionController(TransactionRepository transactionRepository, SentinelClient sentinelClient, FinancialDnaEngine financialDnaEngine, com.aegisfi.api_gateway.service.DecisionEngine decisionEngine) {
         this.transactionRepository = transactionRepository;
         this.sentinelClient = sentinelClient;
         this.financialDnaEngine = financialDnaEngine;
+        this.decisionEngine = decisionEngine;
     }
 
     @PostMapping
@@ -155,6 +157,9 @@ public class TransactionController {
 
     private TransactionResponse mapToResponse(Transaction tx) {
         List<Transaction> history = transactionRepository.findAllByCustomerOrderByTimestampDesc(tx.getCustomer());
+        List<Transaction> allTransactions = transactionRepository.findAll();
+        
+        com.aegisfi.api_gateway.service.DecisionEngine.DecisionResult decision = decisionEngine.evaluate(tx, allTransactions, history);
         
         return TransactionResponse.builder()
                 .id(tx.getId())
@@ -172,6 +177,14 @@ public class TransactionController {
                 .deviceHistory(financialDnaEngine.calculateDeviceHistory(history))
                 .loginPattern(financialDnaEngine.calculateLoginPattern(tx.getRiskScore()))
                 .riskHistory(financialDnaEngine.calculateRiskHistory(history))
+                .recommendedAction(decision.getRecommendedAction())
+                .recommendedActionReason(decision.getReason())
+                .projectedFraudLoss(decision.getProjectedFraudLoss())
+                .customerFriction(decision.getCustomerFriction())
+                .revenueImpact(decision.getRevenueImpact())
+                .complianceStatus(decision.getComplianceStatus())
+                .memorySimilarity(decision.getMemorySimilarity())
+                .sharedDeviceCount(decision.getSharedDeviceCount())
                 .timestamp(tx.getTimestamp())
                 .build();
     }
